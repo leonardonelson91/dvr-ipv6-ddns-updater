@@ -9,6 +9,7 @@ public class DvrConfigPage {
 
 	private By configRedeLink = By.xpath("//a[@title='Config. rede']");
 	private By ipv6Input = By.id("ipv6Address");
+	private By logoutButton = By.name("laExit");
 
 	private WebDriver driver;
 	private WebDriverWait wait;
@@ -20,14 +21,27 @@ public class DvrConfigPage {
 
 	public DvrConfigPage openNetworkConfig() {
 		driver.switchTo().frame("ContentFrame");
-		wait.until(ExpectedConditions.visibilityOfElementLocated(configRedeLink));
+		wait.until(ExpectedConditions.elementToBeClickable(configRedeLink));
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		driver.findElement(configRedeLink).click();
 		return this;
 	}
 	
 	public String getIpv6Address(){
 		wait.until(ExpectedConditions.visibilityOfElementLocated(ipv6Input));
-		return driver.findElement(ipv6Input).getAttribute("value");
+		final String currentIpv6 = driver.findElement(ipv6Input).getAttribute("value");
+		driver.switchTo().defaultContent();
+		return currentIpv6;
 	}
-	
+
+	public void logout() {
+		wait.until(ExpectedConditions.visibilityOfElementLocated(logoutButton));
+		driver.findElement(logoutButton).click();
+		driver.switchTo().alert().accept();
+		driver.switchTo().defaultContent();
+	}
 }
