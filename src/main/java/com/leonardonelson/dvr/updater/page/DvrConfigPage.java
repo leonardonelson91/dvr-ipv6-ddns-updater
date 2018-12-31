@@ -1,47 +1,43 @@
 package com.leonardonelson.dvr.updater.page;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
+import com.gargoylesoftware.htmlunit.html.HtmlInput;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
+
+import java.io.IOException;
 
 public class DvrConfigPage {
 
-	private By configRedeLink = By.xpath("//a[@title='Config. rede']");
-	private By ipv6Input = By.id("ipv6Address");
-	private By logoutButton = By.name("laExit");
+	private final String configRedeLinkXpath = "//a[@title='Network Settings']";
+	private final String ipv6Input = "ipv6Address";
+	private final String logoutButton = "laExit";
 
-	private WebDriver driver;
-	private WebDriverWait wait;
+	private WebClient webClient;
 
-	public DvrConfigPage(WebDriver driver){
-		this.driver = driver;
-		wait = new WebDriverWait(driver, 10);
+	private HtmlPage configPage;
+	private HtmlPage networkConfigPage;
+
+	public DvrConfigPage(WebClient webClient, HtmlPage page) {
+		this.webClient = webClient;
+		this.configPage = page;
 	}
 
-	public DvrConfigPage openNetworkConfig() {
-		driver.switchTo().frame("ContentFrame");
-		wait.until(ExpectedConditions.elementToBeClickable(configRedeLink));
-		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		driver.findElement(configRedeLink).click();
+	public DvrConfigPage openNetworkConfig() throws IOException, InterruptedException {
+		networkConfigPage = (HtmlPage) configPage.getFrameByName("ContentFrame").getEnclosedPage();
+		((HtmlAnchor) networkConfigPage.getFirstByXPath(configRedeLinkXpath)).click();
+		Thread.sleep(5000);
+		networkConfigPage = (HtmlPage) webClient.getCurrentWindow().getEnclosedPage();
 		return this;
 	}
-	
+
 	public String getIpv6Address(){
-		wait.until(ExpectedConditions.visibilityOfElementLocated(ipv6Input));
-		final String currentIpv6 = driver.findElement(ipv6Input).getAttribute("value");
-		driver.switchTo().defaultContent();
+		final String currentIpv6 = ((HtmlInput) networkConfigPage.getElementById(ipv6Input)).getValueAttribute();
 		return currentIpv6;
 	}
 
-	public void logout() {
-		wait.until(ExpectedConditions.visibilityOfElementLocated(logoutButton));
-		driver.findElement(logoutButton).click();
-		driver.switchTo().alert().accept();
-		driver.switchTo().defaultContent();
+	public void logout() throws IOException {
+		webClient.setConfirmHandler((page, message) -> true);
+		configPage.getElementByName(logoutButton).click();
 	}
 }
