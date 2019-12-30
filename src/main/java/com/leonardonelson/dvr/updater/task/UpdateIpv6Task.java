@@ -20,7 +20,7 @@ public class UpdateIpv6Task {
         this.updateService = updateService;
     }
 
-    @Scheduled(fixedDelay = 5000)
+    @Scheduled(fixedDelay = 10 * 60000)
     public void updateIpv6() throws IOException, InterruptedException {
         log.info("Starting DVR IPV6 Update...");
         updateService.updateDvrIpv6();

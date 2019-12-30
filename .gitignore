@@ -2,3 +2,10 @@ out/
 build/
 .idea/
 .gradle/
+.DS_Store
+.classpath
+.project
+.settings/
+.vscode/
+bin/
+*/.DS_Store

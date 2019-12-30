@@ -40,9 +40,8 @@ public class DvrLoginPage {
 	}
 	
 	public DvrConfigPage navigateToConfigPage() throws IOException, InterruptedException {
-		HtmlPage configPage = page.getElementByName(configMenuLink).click();
+		page.getElementByName(configMenuLink).click();
 		Thread.sleep(5000);
-		configPage = (HtmlPage) webClient.getCurrentWindow().getEnclosedPage();
 		return new DvrConfigPage(webClient, page);
 	}
 	
