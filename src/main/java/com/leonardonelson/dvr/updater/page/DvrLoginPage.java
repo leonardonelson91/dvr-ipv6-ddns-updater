@@ -6,8 +6,12 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlSpan;
 
 import java.io.IOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DvrLoginPage {
+
+    private static final Logger log = LoggerFactory.getLogger(DvrLoginPage.class);
 
 	private final String loginInput = "loginUserName";
 	private final String pwdInput = "loginPassword";
@@ -16,21 +20,23 @@ public class DvrLoginPage {
 
 	private String url;
 
-	private WebClient webClient;
+	private final WebClient webClient;
 
 	private HtmlPage page;
 
-	public DvrLoginPage(WebClient webClient) {
+	public DvrLoginPage(final WebClient webClient) {
 		this.webClient = webClient;
 	}
 
-	public DvrLoginPage open(String url) throws IOException {
+	public DvrLoginPage open(final String url) throws IOException {
+		log.info("Opening DVR Page...");
 		page = webClient.getPage(url);
 		this.url = url;
 		return this;
 	}
 	
-	public DvrLoginPage login(String username, String password) throws IOException, InterruptedException {
+	public DvrLoginPage login(final String username, final String password) throws IOException, InterruptedException {
+		log.info("Entering DVR credentials...");
 		((HtmlInput) page.getHtmlElementById(loginInput)).setValueAttribute(username);
 		((HtmlInput) page.getHtmlElementById(pwdInput)).setValueAttribute(password);
 		((HtmlSpan) page.getFirstByXPath(loginButton)).click();
@@ -40,7 +46,9 @@ public class DvrLoginPage {
 	}
 	
 	public DvrConfigPage navigateToConfigPage() throws IOException, InterruptedException {
-		page.getElementByName(configMenuLink).click();
+		log.info("Successfully logged in.");
+		log.info("Navigating to DVR Config Page...");
+		page = page.getElementByName(configMenuLink).click();
 		Thread.sleep(5000);
 		return new DvrConfigPage(webClient, page);
 	}
