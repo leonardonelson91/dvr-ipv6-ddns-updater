@@ -58,6 +58,8 @@ public class Ipv6UpdaterServiceImpl implements IPv6UpdaterService {
         log.info("Sending request to update DVR Ipv6 address to DDNS Provider...");
         ResponseEntity<String> response = restOperations.getForEntity(builder.build().encode().toUri(), String.class);
         log.info("IPV6 API Response: {}", response.getBody());
+
+        dvrConfigPage.logout();
         return HttpStatus.OK.equals(response.getStatusCode());
     }
 }
