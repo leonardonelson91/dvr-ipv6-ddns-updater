@@ -49,8 +49,7 @@ public class DvrLoginPage {
 		log.info("Successfully logged in.");
 		log.info("Navigating to DVR Config Page...");
 		page = page.getElementByName(configMenuLink).click();
-		Thread.sleep(5000);
-		return new DvrConfigPage(webClient, page);
+		return new DvrConfigPage(webClient);
 	}
 	
 }
