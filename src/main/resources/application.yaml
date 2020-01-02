@@ -1,3 +1,8 @@
 ipv6:
   server:
     endpoint: https://dynv6.com/api/update
+
+logging:
+  level:
+    com.gargoylesoftware: off
+    org.apache.http: off

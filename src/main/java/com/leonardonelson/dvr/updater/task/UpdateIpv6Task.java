@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+
 @Component
 public class UpdateIpv6Task {
 
@@ -18,8 +20,8 @@ public class UpdateIpv6Task {
         this.updateService = updateService;
     }
 
-    @Scheduled(fixedDelay = 5000)
-    public void updateIpv6() {
+    @Scheduled(fixedDelay = 10 * 60000)
+    public void updateIpv6() throws IOException, InterruptedException {
         log.info("Starting DVR IPV6 Update...");
         updateService.updateDvrIpv6();
         log.info("Finished DVR IPV6 Update");

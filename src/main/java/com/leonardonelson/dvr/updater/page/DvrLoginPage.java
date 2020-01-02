@@ -1,43 +1,55 @@
 package com.leonardonelson.dvr.updater.page;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.HtmlInput;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.gargoylesoftware.htmlunit.html.HtmlSpan;
+
+import java.io.IOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DvrLoginPage {
 
-	private By loginInput = By.id("loginUserName");
-	private By pwdInput = By.id("loginPassword");
-	private By loginButton = By.className("loginbtn");
-	private By configMenuLink = By.name("laConfig");
+    private static final Logger log = LoggerFactory.getLogger(DvrLoginPage.class);
 
-	private WebDriver driver;
-	
-	private WebDriverWait wait;
-	
-	public DvrLoginPage(WebDriver driver){
-		this.driver = driver;
-		wait = new WebDriverWait(driver, 10);
+	private final String loginInput = "loginUserName";
+	private final String pwdInput = "loginPassword";
+	private final String loginButton = "//span[@class=\"loginbtn\"]";
+	private final String configMenuLink = "laConfig";
+
+	private String url;
+
+	private final WebClient webClient;
+
+	private HtmlPage page;
+
+	public DvrLoginPage(final WebClient webClient) {
+		this.webClient = webClient;
 	}
-	
-	public DvrLoginPage open(String url){
-		driver.get(url);
-		wait.until(ExpectedConditions.visibilityOf(driver.findElement(loginInput)));
+
+	public DvrLoginPage open(final String url) throws IOException {
+		log.info("Opening DVR Page...");
+		page = webClient.getPage(url);
+		this.url = url;
 		return this;
 	}
 	
-	public DvrLoginPage login(String username, String password){
-		driver.findElement(loginInput).sendKeys(username);
-		driver.findElement(pwdInput).sendKeys(password);
-		driver.findElement(loginButton).click();
+	public DvrLoginPage login(final String username, final String password) throws IOException, InterruptedException {
+		log.info("Entering DVR credentials...");
+		((HtmlInput) page.getHtmlElementById(loginInput)).setValueAttribute(username);
+		((HtmlInput) page.getHtmlElementById(pwdInput)).setValueAttribute(password);
+		((HtmlSpan) page.getFirstByXPath(loginButton)).click();
+		Thread.sleep(5000);
+		page = webClient.getPage(url + "/doc/page/main.asp");
 		return this;
 	}
 	
-	public DvrLoginPage navigateToConfigPage() {
-		wait.until(ExpectedConditions.elementToBeClickable(configMenuLink));
-		driver.findElement(configMenuLink).click();
-		return this;
+	public DvrConfigPage navigateToConfigPage() throws IOException, InterruptedException {
+		log.info("Successfully logged in.");
+		log.info("Navigating to DVR Config Page...");
+		page = page.getElementByName(configMenuLink).click();
+		return new DvrConfigPage(webClient);
 	}
 	
 }
